@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Product\ProductCollection;
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Http\Resources\Product\ProductResource; // Ensure this line is included
 
 class ProductController extends Controller
 {
@@ -13,7 +15,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        return new ProductCollection(Product::paginate());
+        // return Product::paginate();
     }
 
     /**
@@ -37,7 +40,8 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+      
+        return new ProductResource($product); 
     }
 
     /**
