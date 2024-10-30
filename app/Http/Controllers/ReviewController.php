@@ -37,10 +37,15 @@ class ReviewController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Review $review)
+    public function show($productId, Review $review)
     {
-        //
+        if ($review->product_id != $productId) {
+            return response()->json(['error' => 'Review not found for this product'], 404);
+        }
+    
+        return new ReviewResource($review);
     }
+    
 
     /**
      * Show the form for editing the specified resource.
