@@ -7,7 +7,7 @@ use App\Http\Controllers\ReviewController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+})->middleware('auth:api');
 
 Route::apiResource('/products', ProductController::class);
 Route::group(['prefix' => 'products'], function () {
