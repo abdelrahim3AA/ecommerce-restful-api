@@ -567,6 +567,17 @@ class Handler implements ExceptionHandlerContract
     {
         $e = $this->mapException($e);
 
+        if ($request->expectsJson()) {
+            if ($e instanceof ModelNotFoundException) {
+                return response()->json(['error' => 'Product model not found!'], 404);
+            }
+
+            if ($e instanceof NotFoundHttpException) {
+                return response()->json(['error' => 'Route not found.'], 404);
+            }
+        }
+        
+        
         if (method_exists($e, 'render') && $response = $e->render($request)) {
             return $this->finalizeRenderedResponse(
                 $request,
