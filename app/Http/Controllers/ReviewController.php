@@ -7,6 +7,8 @@ use App\Models\Review;
 use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
 use App\Http\Resources\ReviewResource;
+use Symfony\Component\HttpFoundation\Response;
+
 
 class ReviewController extends Controller
 {
@@ -15,8 +17,13 @@ class ReviewController extends Controller
      */
     public function index(Product $product)
     {
+        if ($product->reviews->isEmpty()) {
+            return response()->json(['message' => 'No Reviews Yet'], Response::HTTP_NO_CONTENT);
+        }
+
         return ReviewResource::collection($product->reviews);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -40,7 +47,7 @@ class ReviewController extends Controller
     public function show($productId, Review $review)
     {
         if ($review->product_id != $productId) {
-            return response()->json(['error' => 'Review not found for this product'], 404);
+            return response()->json(['error' => 'Review not found for this product'], Response::HTTP_NOT_FOUND);
         }
     
         return new ReviewResource($review);
