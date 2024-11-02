@@ -72,7 +72,7 @@ class ProductController extends Controller implements \Illuminate\Routing\Contro
      */
     public function edit(Product $product)
     {
-        return new ProductResource($product);
+        //
     }
 
     /**
@@ -80,7 +80,20 @@ class ProductController extends Controller implements \Illuminate\Routing\Contro
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        //
+        // $product->name = $request->name;
+        // $product->detail = $request->description;
+        // $product->price = $request->price;
+        // $product->stock = $request->stock;
+        // $product->discount = $request->discount;
+
+        $product->detail = $request->description;
+        unset($request->description);
+        $product->update($request->all());
+
+        return response([
+            'data' => new ProductResource($product),
+           'message' => 'Product updated successfully',
+        ],Response::HTTP_OK);
     }
 
     /**
