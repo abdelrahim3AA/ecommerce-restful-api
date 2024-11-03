@@ -36,9 +36,14 @@ class ReviewController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreReviewRequest $request)
+    public function store(StoreReviewRequest $request, Product $product)
     {
-        //
+        $review = new Review($request->all()); 
+        $product->reviews()->save($review);
+        return response([
+            'data' => new ReviewResource($review)
+        ], Response::HTTP_CREATED); 
+
     }
 
     /**
@@ -67,7 +72,7 @@ class ReviewController extends Controller
      */
     public function update(UpdateReviewRequest $request, Review $review)
     {
-        //
+       
     }
 
     /**

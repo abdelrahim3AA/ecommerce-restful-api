@@ -11,7 +11,7 @@ class UpdateReviewRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class UpdateReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'star' => ['required', 'integer', 'between:0,5'],
+            'customer' => ['required'],
+            'review' => ['required']
         ];
     }
 }
