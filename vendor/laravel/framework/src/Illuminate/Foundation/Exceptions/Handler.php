@@ -568,6 +568,7 @@ class Handler implements ExceptionHandlerContract
         $e = $this->mapException($e);
 
         if ($request->expectsJson()) {
+            
             if ($e instanceof ModelNotFoundException) {
                 return response()->json(['error' => 'Product model not found!'], 404);
             }

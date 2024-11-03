@@ -9,7 +9,8 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\Product\ProductResource;
 use Illuminate\Routing\Controllers\Middleware;
 use Symfony\Component\HttpFoundation\Response;
-
+use App\Exceptions\ProductNotBelongsToUser; 
+use Auth;
 
 class ProductController extends Controller implements \Illuminate\Routing\Controllers\HasMiddleware
 {
@@ -80,11 +81,8 @@ class ProductController extends Controller implements \Illuminate\Routing\Contro
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        // $product->name = $request->name;
-        // $product->detail = $request->description;
-        // $product->price = $request->price;
-        // $product->stock = $request->stock;
-        // $product->discount = $request->discount;
+        // Check if the product belongs to the authenticated user  // throw an exception if it doesn't belong to the user
+        $this->ProductUserCheck($product);
 
         $product->detail = $request->description;
         unset($request->description);
@@ -101,9 +99,18 @@ class ProductController extends Controller implements \Illuminate\Routing\Contro
      */
     public function destroy(Product $product)
     {
+        // Check if the product belongs to the authenticated user  // throw an exception if it doesn't belong to the user
+        $this->ProductUserCheck($product); 
         $product->delete();
-
         return response(null,Response::HTTP_NO_CONTENT);
+    }
+
+    public function ProductUserCheck($product) 
+    {
+        if (Auth::id() !== $product->user_id) 
+        {
+            throw new ProductNotBelongsToUser; 
+        }
     }
 }
  

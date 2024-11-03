@@ -11,7 +11,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'detail', 'price', 'stock', 'discount'
+        'name', 'detail', 'price', 'stock', 'discount', 'user_id'
     ];
     
     public function reviews() {

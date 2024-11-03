@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Product; // Import the Product model
+use App\Models\User as User; // Import the User model
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
@@ -30,6 +31,9 @@ class ProductFactory extends Factory
             'price' => $this->faker->numberBetween(100, 1000),  // Random price
             'stock' => $this->faker->numberBetween(1, 50),  // Random stock amount
             'discount' => $this->faker->numberBetween(2, 30),  // Random discount percentage
+            'user_id' => function () {
+                return User::all()->random(); 
+            },
             'created_at' => now(),
             'updated_at' => now(),
         ];
