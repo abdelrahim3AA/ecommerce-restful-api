@@ -8,12 +8,37 @@ use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
 use App\Http\Resources\ReviewResource;
 use Symfony\Component\HttpFoundation\Response;
+use OpenApi\Annotations as OA;
 
 
 class ReviewController extends Controller
 {
     /**
      * Display a listing of the resource.
+     */
+    /**
+     * @OA\Get(
+     *     path="/api/products/{product}/reviews",
+     *     operationId="getReviewsList",
+     *     tags={"Reviews"},
+     *     summary="Get list of reviews for a product",
+     *     description="Returns a list of reviews for the specified product",
+     *     @OA\Parameter(
+     *         name="product",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/Review")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found"
+     *     )
+     * )
      */
     public function index(Product $product)
     {
@@ -36,6 +61,34 @@ class ReviewController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+     /**
+     * @OA\Post(
+     *     path="/api/products/{product}/reviews",
+     *     operationId="storeReview",
+     *     tags={"Reviews"},
+     *     summary="Store a new review",
+     *     description="Creates a new review for a product",
+     *     @OA\Parameter(
+     *         name="product",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/Review")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Review created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Review")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid input"
+     *     )
+     * )
+     */
     public function store(StoreReviewRequest $request, Product $product)
     {
         $review = new Review($request->all()); 
@@ -48,6 +101,36 @@ class ReviewController extends Controller
 
     /**
      * Display the specified resource.
+     */
+    /**
+     * @OA\Get(
+     *     path="/api/products/{product}/reviews/{id}",
+     *     operationId="showReview",
+     *     tags={"Reviews"},
+     *     summary="Show a review",
+     *     description="Returns a single review for a product",
+     *     @OA\Parameter(
+     *         name="product",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/Review")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Review not found"
+     *     )
+     * )
      */
     public function show($productId, Review $review)
     {
@@ -70,16 +153,89 @@ class ReviewController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateReviewRequest $request, Review $review)
+    /**
+     * @OA\Put(
+     *     path="/api/products/{product}/reviews/{id}",
+     *     operationId="updateReview",
+     *     tags={"Reviews"},
+     *     summary="Update an existing review",
+     *     description="Updates the review information",
+     *     @OA\Parameter(
+     *         name="product",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/Review")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Review updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Review")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Review not found"
+     *     )
+     * )
+     */
+    public function update(UpdateReviewRequest $request, Product $product, Review $review)
     {
-       
+        if ($review->product_id != $product->id) {
+            return response()->json(['error' => 'Review not found for this product'], Response::HTTP_NOT_FOUND);
+        }
+        $review->update($request->all());
+        return response([
+            'data' => new ReviewResource($review)
+        ], Response::HTTP_OK);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Review $review)
+    /**
+     * @OA\Delete(
+     *     path="/api/products/{product}/reviews/{id}",
+     *     operationId="destroyReview",
+     *     tags={"Reviews"},
+     *     summary="Delete a review",
+     *     description="Deletes a review by ID",
+     *     @OA\Parameter(
+     *         name="product",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Review deleted successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Review not found"
+     *     )
+     * )
+     */
+    public function destroy(Product $product, Review $review)
     {
-        //
+        if ($review->product_id != $product->id) {
+            return response()->json(['error' => 'Review not found for this product'], Response::HTTP_NOT_FOUND);
+        }
+        $review->delete();
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }
